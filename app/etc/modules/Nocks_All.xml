@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nocks_NocksPaymentGateway>
+            <active>true</active>
+            <codePool>community</codePool>
+
+            <depends>
+                <Mage_Payment />
+            </depends>
+        </Nocks_NocksPaymentGateway>
+    </modules>
+</config>
