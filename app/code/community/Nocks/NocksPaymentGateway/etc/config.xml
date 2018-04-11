@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nocks_NocksPaymentGateway>
+            <version>1.0.0.0</version>
+        </Nocks_NocksPaymentGateway>
+    </modules>
+
+    <global>
+        <fieldsets>
+            <sales_convert_quote_payment>
+                <nocks_transaction_id>
+                    <to_order_payment>*</to_order_payment>
+                </nocks_transaction_id>
+            </sales_convert_quote_payment>
+        </fieldsets>
+
+        <helpers>
+            <nockspaymentgateway>
+                <class>Nocks_NocksPaymentGateway_Helper</class>
+            </nockspaymentgateway>
+        </helpers>
+
+        <models>
+            <nockspaymentgateway>
+                <class>Nocks_NocksPaymentGateway_Model</class>
+            </nockspaymentgateway>
+        </models>
+
+        <resources>
+            <nockspaymentgateway_setup>
+                <setup>
+                    <module>Nocks_NocksPaymentGateway</module>
+                </setup>
+            </nockspaymentgateway_setup>
+        </resources>
+    </global>
+
+    <default>
+        <payment>
+            <nockspaymentgateway>
+                <active>1</active>
+                <model>nockspaymentgateway/paymentmethod</model>
+                <order_status>pending</order_status>
+                <title>Gulden</title>
+                <allowspecific>0</allowspecific>
+                <payment_action>sale</payment_action>
+                <access_token backend_model="adminhtml/system_config_backend_encrypted" />
+                <merchant backend_model="adminhtml/system_config_backend_encrypted" />
+            </nockspaymentgateway>
+        </payment>
+    </default>
+
+    <frontend>
+        <routers>
+            <nockspaymentgateway>
+                <use>standard</use>
+                <args>
+                    <module>Nocks_NocksPaymentGateway</module>
+                    <frontName>nockspaymentgateway</frontName>
+                </args>
+            </nockspaymentgateway>
+        </routers>
+        <translate>
+            <modules>
+                <nockspaymentgateway>
+                    <files>
+                        <default>Nocks_PaymentGateway.csv</default>
+                    </files>
+                </nockspaymentgateway>
+            </modules>
+        </translate>
+    </frontend>
+</config>
