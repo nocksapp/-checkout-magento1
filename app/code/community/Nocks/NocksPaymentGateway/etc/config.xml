@@ -34,19 +34,25 @@
                 </setup>
             </nockspaymentgateway_setup>
         </resources>
+        <blocks>
+            <nockspaymentgateway>
+                <class>Nocks_NocksPaymentGateway_Block</class>
+            </nockspaymentgateway>
+        </blocks>
     </global>
 
     <default>
         <payment>
             <nockspaymentgateway>
                 <active>1</active>
+                <testmode>0</testmode>
                 <model>nockspaymentgateway/paymentmethod</model>
                 <order_status>pending</order_status>
                 <title>Gulden</title>
                 <allowspecific>0</allowspecific>
                 <payment_action>sale</payment_action>
-                <access_token backend_model="adminhtml/system_config_backend_encrypted" />
-                <merchant backend_model="adminhtml/system_config_backend_encrypted" />
+                <access_token/>
+                <merchant/>
             </nockspaymentgateway>
         </payment>
     </default>
@@ -71,4 +77,15 @@
             </modules>
         </translate>
     </frontend>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <nockspaymentgateway>
+                    <file>nockspaymentgateway.xml</file>
+                </nockspaymentgateway>
+            </updates>
+        </layout>
+    </adminhtml>
+
 </config>

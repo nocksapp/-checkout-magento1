@@ -18,6 +18,7 @@ class Nocks_NocksPaymentGateway_Model_Paymentmethod extends Mage_Payment_Model_M
 	public function getOrderPlaceRedirectUrl()
 	{
 		$accessToken = Mage::getStoreConfig('payment/nockspaymentgateway/access_token');
+		$testMode = Mage::getStoreConfig('payment/nockspaymentgateway/testmode') === '1';
 		$merchant = Mage::getStoreConfig('payment/nockspaymentgateway/merchant');
 
 		/** @var Mage_Sales_Model_Quote_Payment $payment */
@@ -30,7 +31,7 @@ class Nocks_NocksPaymentGateway_Model_Paymentmethod extends Mage_Payment_Model_M
 		$callbackUrl = Mage::getUrl('nockspaymentgateway/payment/callback', ['_secure' => true]);
 
 		// Create the Nocks transactions
-		$nocks = new Nocks_NocksPaymentGateway_Api($accessToken);
+		$nocks = new Nocks_NocksPaymentGateway_Api($accessToken, $testMode);
 		$response = $nocks->createTransaction([
 			'merchant_profile' => $merchant,
 			'source_currency' => 'NLG',
@@ -48,10 +49,10 @@ class Nocks_NocksPaymentGateway_Model_Paymentmethod extends Mage_Payment_Model_M
 		if ($response) {
 			// Save transaction id by order
 			$payment->setNocksTransactionId($response['data']['uuid'])->save();
-			$order->setPayment($payment)->save();
+//			$order->setPayment($payment)->save();
 
 			// Redirect to payment
-			return 'https://nocks.com/payment/url/' . $response['data']['payments']['data'][0]['uuid'];
+			return $response['data']['payments']['data'][0]['metadata']['url'];
 		}
 
 		// Something went wrong

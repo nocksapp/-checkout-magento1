@@ -3,13 +3,33 @@
 
 class Nocks_NocksPaymentGateway_Api
 {
-
-	protected $url = 'https://api.nocks.com/api/v2/';
+	protected $url;
+	protected $oauthUrl;
 
 	protected $accessToken;
 
-	public function __construct($accessToken) {
+	public function __construct($accessToken, $testMode = false) {
 		$this->accessToken = $accessToken;
+
+		$this->url = $testMode ? 'https://sandbox.nocks.com/api/v2/' : 'https://api.nocks.com/api/v2/';
+		$this->oauthUrl = $testMode ? 'https://sandbox.nocks.com/oauth/' : 'https://www.nocks.com/oauth/';
+	}
+
+	/**
+	 * Get the token scopes
+	 *
+	 * @return array
+	 */
+	public function getTokenScopes() {
+		$response = $this->call('token-scopes', null, true);
+
+		if ($response) {
+			return array_map(function($scope) {
+				return $scope['id'];
+			}, $response);
+		}
+
+		return [];
 	}
 
 	/**
@@ -61,40 +81,33 @@ class Nocks_NocksPaymentGateway_Api
 		return null;
 	}
 
-	public function call($action, $postData) {
+	public function call($action, $postData, $isOauth = false) {
 		if ($this->accessToken) {
-			$curl = curl_init($this->url . $action);
-			$length = 0;
-
-			if (is_array($postData)) {
-				$jsonData = json_encode($postData);
-				curl_setopt($curl, CURLOPT_POST, 1);
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
-
-				$length = strlen($jsonData);
-			}
-
-			$header = [
+			$url = ($isOauth ? $this->oauthUrl : $this->url) . $action;
+			$method = is_array($postData) ? 'POST' : 'GET';
+			$headers = [
+				'Accept: application/json',
 				'Content-Type: application/json',
-				'Content-Length: ' . $length,
 				'Authorization: Bearer ' . $this->accessToken
 			];
 
-			curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-			curl_setopt($curl, CURLOPT_PORT, 443);
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-			curl_setopt($curl, CURLOPT_TIMEOUT, 10);
-			curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);
-			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_FORBID_REUSE, 1);
-			curl_setopt($curl, CURLOPT_FRESH_CONNECT, 1);
+			$ch = curl_init();
 
-			$responseString = curl_exec($curl);
-			$httpStatusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 
-			curl_close($curl);
+			if (in_array($method, ['POST', 'PUT'])) {
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+			}
+
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+			$responseString = curl_exec($ch);
+			$httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+			curl_close($ch);
 
 			if ($httpStatusCode >= 200 && $httpStatusCode < 300 && $responseString) {
 				return json_decode($responseString, true);
