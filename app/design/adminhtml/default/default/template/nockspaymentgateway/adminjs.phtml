@@ -18,8 +18,6 @@
     var $j = jQuery.noConflict();
 
     $j(document).ready(function() {
-        console.log('ready');
-
         var merchantsTimeout = null;
         var $merchantSelect = $j('#payment_nockspaymentgateway_merchant');
         $merchantSelect.before('<p id="payment_nockspaymentgateway_merchants_message" style="display: none; color: red"></p>');
@@ -101,4 +99,3 @@
         }]
     ]);
 </script>
-
