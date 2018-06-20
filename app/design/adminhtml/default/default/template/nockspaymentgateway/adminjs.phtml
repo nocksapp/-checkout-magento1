@@ -1,0 +1,104 @@
+<?php
+    $validateAccessTokenUrl = Mage::getUrl('nockspaymentgateway/ajax/validateAccessToken', ['_secure' => true]);
+    $merchantsUrl = Mage::getUrl('nockspaymentgateway/ajax/merchants', ['_secure' => true]);
+
+    $loadingMerchantsText = $this->__('Loading merchants');
+    $noMerchantsFoundText = $this->__('No merchants found');
+    $invalidAccessTokenText = $this->__('Invalid access token, make sure the access token has the right scopes');
+?>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript">
+    var validateAccessTokenUrl = '<?php echo $validateAccessTokenUrl; ?>';
+    var merchantsUrl = '<?php echo $merchantsUrl; ?>';
+    var loadingMerchantsText = '<?php echo $loadingMerchantsText; ?>';
+    var noMerchantsFoundText = '<?php echo $noMerchantsFoundText; ?>';
+    var invalidAccessTokenText = '<?php echo $invalidAccessTokenText; ?>';
+
+    var $j = jQuery.noConflict();
+
+    $j(document).ready(function() {
+        console.log('ready');
+
+        var merchantsTimeout = null;
+        var $merchantSelect = $j('#payment_nockspaymentgateway_merchant');
+        $merchantSelect.before('<p id="payment_nockspaymentgateway_merchants_message" style="display: none; color: red"></p>');
+
+        if ($merchantSelect.find('option').length === 0) {
+            $merchantSelect.hide();
+            $j('#payment_nockspaymentgateway_merchants_message')
+                .html(noMerchantsFoundText)
+                .show();
+        }
+
+        function getMerchants() {
+            $merchantSelect.hide();
+            $j('#payment_nockspaymentgateway_merchants_message')
+                .html(loadingMerchantsText)
+                .show();
+
+            clearTimeout(merchantsTimeout);
+            merchantsTimeout = setTimeout(function() {
+                var testmode = $j('#payment_nockspaymentgateway_testmode').val();
+                var accessToken = $j('#payment_nockspaymentgateway_access_token').val();
+
+                $j.ajax({
+                    method: 'POST',
+                    url: merchantsUrl,
+                    data: {
+                        accessToken: accessToken,
+                        testMode: testmode
+                    }
+                }).done(function(data) {
+                    if (data.merchants.length > 0) {
+                        $merchantSelect.find('option').remove().end();
+
+                        for (var i = 0; i < data.merchants.length; i++) {
+                            var merchant = data.merchants[i];
+                            $merchantSelect.append('<option value="' + merchant.value + '">' + merchant.label + '</option>');
+                        }
+
+                        $merchantSelect.show();
+                        $j('#payment_nockspaymentgateway_merchants_message').hide();
+                    } else {
+                        $merchantSelect.hide();
+                        $j('#payment_nockspaymentgateway_merchants_message')
+                            .html(noMerchantsFoundText)
+                            .show();
+                    }
+                });
+            }, 200);
+        }
+
+        $j('#payment_nockspaymentgateway_testmode').on('change', function() {
+            getMerchants();
+        });
+
+        $j('#payment_nockspaymentgateway_access_token').on('change keyup', function() {
+            getMerchants();
+        });
+    });
+
+    Validation.addAllThese([
+        ['validate-accessToken', invalidAccessTokenText, function(v) {
+            var valid = false;
+            var testmode = $j('#payment_nockspaymentgateway_testmode').val();
+
+            $j.ajax({
+                method: 'POST',
+                url: validateAccessTokenUrl,
+                async: false,
+                success: function (result) {
+                    valid = result.valid;
+                },
+                data: {
+                    accessToken: v,
+                    testMode: testmode
+                }
+            });
+
+            return valid;
+        }]
+    ]);
+</script>
+

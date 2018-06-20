@@ -2,3 +2,6 @@
 "Order not found", "Order niet gevonden"
 "Something went wrong.", "Er is iets fout gegaan."
 "Payment cancelled, please try again.", "Betaling geannuleerd, probeer opnieuw."
+"Invalid access token, make sure the access token has the right scopes", "Ongeldige access token, zorg ervoor dat de access token de juiste scopes heeft"
+"No merchants found", "Geen merchants gevonden"
+"Loading merchants", "Merchants aan het laden"

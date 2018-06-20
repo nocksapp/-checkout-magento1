@@ -10,7 +10,9 @@ class Nocks_NocksPaymentGateway_PaymentController extends Mage_Core_Controller_F
 		parent::__construct($request, $response, $invokeArgs);
 
 		$accessToken = Mage::getStoreConfig('payment/nockspaymentgateway/access_token');
-		$this->nocks = new Nocks_NocksPaymentGateway_Api($accessToken);
+		$testMode = Mage::getStoreConfig('payment/nockspaymentgateway/testmode') === '1';
+
+		$this->nocks = new Nocks_NocksPaymentGateway_Api($accessToken, $testMode);
 	}
 
 	/**
@@ -76,8 +78,8 @@ class Nocks_NocksPaymentGateway_PaymentController extends Mage_Core_Controller_F
 	public function callbackAction()
 	{
 		// Get the transaction id from the request body
-		$transactionId = $entityBody = file_get_contents('php://input');
-		$this->getResponse()->setHeader('Content-type', 'application/json');
+		$transactionId = file_get_contents('php://input');
+		$this->getResponse()->setHeader('Content-type', 'application/json', true);
 
 		if ($transactionId) {
 			// Get the transaction
@@ -90,11 +92,12 @@ class Nocks_NocksPaymentGateway_PaymentController extends Mage_Core_Controller_F
 				$payment = Mage::getModel('sales/quote_payment')->load($metadata['payment_id']);
 				/** @var Mage_Sales_Model_Quote $quote */
 				$quote = Mage::getModel('sales/quote')->load($payment->getQuoteId());
+				/** @var Mage_Sales_Model_Order $order */
 				$order = Mage::getModel('sales/order')->loadByIncrementId($quote->getReservedOrderId());
 
 				if ($order) {
 					// Change the order state
-					$order->setPayment($payment);
+					// $order->setPayment($payment);
 
 					if ($transaction['status'] === 'completed') {
 						if ($order->canInvoice()) {

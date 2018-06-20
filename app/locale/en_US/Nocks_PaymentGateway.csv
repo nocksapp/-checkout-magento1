@@ -2,3 +2,6 @@
 "Order not found", "Order not found"
 "Something went wrong.", "Something went wrong."
 "Payment cancelled, please try again.", "Payment cancelled, please try again."
+"Invalid access token, make sure the access token has the right scopes", "Invalid access token, make sure the access token has the right scopes"
+"No merchants found", "No merchants found"
+"Loading merchants", "Loading merchants"
