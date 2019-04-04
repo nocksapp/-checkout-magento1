@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Nocks_NocksPaymentGateway>
-            <version>1.0.0.0</version>
+            <version>1.1.0.0</version>
         </Nocks_NocksPaymentGateway>
     </modules>
 
@@ -43,17 +43,39 @@
 
     <default>
         <payment>
-            <nockspaymentgateway>
-                <active>1</active>
+            <nocks>
                 <testmode>0</testmode>
-                <model>nockspaymentgateway/paymentmethod</model>
-                <order_status>pending</order_status>
-                <title>Gulden</title>
-                <allowspecific>0</allowspecific>
-                <payment_action>sale</payment_action>
                 <access_token/>
                 <merchant/>
-            </nockspaymentgateway>
+            </nocks>
+            <nocks_gulden>
+                <active>1</active>
+                <title>Gulden</title>
+                <model>nockspaymentgateway/gulden</model>
+                <sort_order>1</sort_order>
+                <allowspecific>0</allowspecific>
+            </nocks_gulden>
+            <nocks_ideal>
+                <active>0</active>
+                <title>iDEAL</title>
+                <model>nockspaymentgateway/ideal</model>
+                <sort_order>2</sort_order>
+                <allowspecific>0</allowspecific>
+            </nocks_ideal>
+            <nocks_sepa>
+                <active>0</active>
+                <title>SEPA</title>
+                <model>nockspaymentgateway/sepa</model>
+                <sort_order>3</sort_order>
+                <allowspecific>0</allowspecific>
+            </nocks_sepa>
+            <nocks_balance>
+                <active>0</active>
+                <title>Nocks Balance</title>
+                <model>nockspaymentgateway/balance</model>
+                <sort_order>4</sort_order>
+                <allowspecific>0</allowspecific>
+            </nocks_balance>
         </payment>
     </default>
 
