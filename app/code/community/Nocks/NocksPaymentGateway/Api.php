@@ -81,6 +81,21 @@ class Nocks_NocksPaymentGateway_Api
 		return null;
 	}
 
+	/**
+	 * Get all the ideal issuers
+	 *
+	 * @return array
+	 */
+	public function getIdealIssuers() {
+		$response = $this->call('settings', null);
+
+		if ($response) {
+			return $response['payment_methods']['ideal']['metadata']['issuers'];
+		}
+
+		return [];
+	}
+
 	public function call($action, $postData, $isOauth = false) {
 		if ($this->accessToken) {
 			$url = ($isOauth ? $this->oauthUrl : $this->url) . $action;

@@ -47,29 +47,33 @@ class Nocks_NocksPaymentGateway_PaymentController extends Mage_Core_Controller_F
 		// we need to fetch the transaction from Nocks to check the status.
 		// We don't change the order state here, this is always done in the Callback.
 		$transaction = $this->nocks->getTransaction($payment->getNocksTransactionId());
-		if ($transaction['status'] === 'completed') {
+		if ($transaction['status'] === 'completed' || $transaction['status'] === 'open') {
 			try {
 				// Redirect to success
 				$quote->setIsActive(false)->save();
 				$session->unsQuoteId();
 
-				$this->_redirect('checkout/onepage/success', ['_secure' => true]);
+				if ($transaction['status'] === 'open') {
+					$msg = 'We have not received a definite payment status. Depending on the payment method, it may take a while until we receive the payment';
+					Mage::getSingleton('core/session')->addNotice($this->__($msg));
+				}
+
+				return $this->_redirect('checkout/onepage/success', ['_secure' => true]);
 			} catch (\Exception $e) {
 				Mage::getSingleton('core/session')->addError($this->__('Something went wrong'));
-				$this->_redirect('checkout/cart', ['_secure' => true]);
+				return $this->_redirect('checkout/cart', ['_secure' => true]);
 			}
-		} else {
-			$quote->setIsActive(true)->save();
-
-			// Not completed
-			if ($transaction['status'] === 'cancelled') {
-				Mage::getSingleton('core/session')->addNotice($this->__('Payment cancelled, please try again.'));
-			} else {
-				Mage::getSingleton('core/session')->addError($this->__('Something went wrong'));
-			}
-
-			$this->_redirect('checkout/cart', ['_secure' => true]);
 		}
+
+		$quote->setIsActive(true)->save();
+
+		if ($transaction['status'] === 'cancelled') {
+			Mage::getSingleton('core/session')->addNotice($this->__('Payment cancelled, please try again.'));
+		} else {
+			Mage::getSingleton('core/session')->addError($this->__('Something went wrong'));
+		}
+
+		return $this->_redirect('checkout/cart', ['_secure' => true]);
 	}
 
 	/**

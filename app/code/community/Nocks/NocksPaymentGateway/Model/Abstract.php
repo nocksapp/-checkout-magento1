@@ -1,8 +1,10 @@
 <?php
 
-class Nocks_NocksPaymentGateway_Model_Paymentmethod extends Mage_Payment_Model_Method_Abstract
+abstract class Nocks_NocksPaymentGateway_Model_Abstract extends Mage_Payment_Model_Method_Abstract
 {
-	protected $_code  = 'nockspaymentgateway';
+	protected $_sourceCurrency = null;
+
+	protected abstract function getPaymentMethodData();
 
 	/**
 	 * Check method for processing with base currency
@@ -23,8 +25,8 @@ class Nocks_NocksPaymentGateway_Model_Paymentmethod extends Mage_Payment_Model_M
 
 		/** @var Mage_Sales_Model_Quote_Payment $payment */
 		$payment = $this->getInfoInstance();
-		$quote = $payment->getQuote();
 		/** @var Mage_Sales_Model_Quote $quote */
+		$quote = $payment->getQuote();
 		$order = Mage::getModel('sales/order')->loadByIncrementId($quote->getReservedOrderId());
 
 		$redirectUrl = Mage::getUrl('nockspaymentgateway/payment/redirect', ['_secure' => true, 'payment_id' => $payment->getId()]);
@@ -32,24 +34,30 @@ class Nocks_NocksPaymentGateway_Model_Paymentmethod extends Mage_Payment_Model_M
 
 		// Create the Nocks transactions
 		$nocks = new Nocks_NocksPaymentGateway_Api($accessToken, $testMode);
-		$response = $nocks->createTransaction([
+		$transactionData = [
 			'merchant_profile' => $merchant,
-			'source_currency' => 'NLG',
 			'amount' => [
 				'amount' => strval($quote->getGrandTotal()),
 				'currency' => $quote->getQuoteCurrencyCode(),
 			],
 			'redirect_url' => $redirectUrl,
 			'callback_url' => $callbackUrl,
+			'payment_method' => $this->getPaymentMethodData(),
 			'metadata' => [
 				'payment_id' => $payment->getId(),
 			],
-		]);
+		];
+
+		if ($this->_sourceCurrency) {
+			$transactionData['source_currency'] = $this->_sourceCurrency;
+		}
+
+		$response = $nocks->createTransaction($transactionData);
 
 		if ($response) {
 			// Save transaction id by order
 			$payment->setNocksTransactionId($response['data']['uuid'])->save();
-//			$order->setPayment($payment)->save();
+			$order->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true)->save();
 
 			// Redirect to payment
 			return $response['data']['payments']['data'][0]['metadata']['url'];

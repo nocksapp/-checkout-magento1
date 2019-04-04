@@ -1,0 +1,18 @@
+<?php
+$issuers = $this->getIssuers();
+
+if (sizeof($issuers) > 0) {
+	$options = array_reduce( array_keys( $issuers ), function ( $res, $issuer ) use ( $issuers ) {
+		return $res . '<option value="' . $issuer . '">' . $issuers[ $issuer ] . '</option>';
+	}, '<option value="">' . $this->__( 'Select your bank' ) . '</option>' );
+
+	?>
+    <div class="form-list" id="payment_form_nocks_ideal" style="display:none">
+        <div class="input-box">
+            <select name="nocks_ideal_issuer" id="nocks_ideal_issuer" class="input-text">
+                <?php echo $options; ?>
+            </select>
+         </div>
+    </div>
+	<?php
+}

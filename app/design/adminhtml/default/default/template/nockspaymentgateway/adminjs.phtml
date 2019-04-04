@@ -19,26 +19,26 @@
 
     $j(document).ready(function() {
         var merchantsTimeout = null;
-        var $merchantSelect = $j('#payment_nockspaymentgateway_merchant');
-        $merchantSelect.before('<p id="payment_nockspaymentgateway_merchants_message" style="display: none; color: red"></p>');
+        var $merchantSelect = $j('#payment_nocks_merchant');
+        $merchantSelect.before('<p id="payment_nocks_merchants_message" style="display: none; color: red"></p>');
 
         if ($merchantSelect.find('option').length === 0) {
             $merchantSelect.hide();
-            $j('#payment_nockspaymentgateway_merchants_message')
+            $j('#payment_nocks_merchants_message')
                 .html(noMerchantsFoundText)
                 .show();
         }
 
         function getMerchants() {
             $merchantSelect.hide();
-            $j('#payment_nockspaymentgateway_merchants_message')
+            $j('#payment_nocks_merchants_message')
                 .html(loadingMerchantsText)
                 .show();
 
             clearTimeout(merchantsTimeout);
             merchantsTimeout = setTimeout(function() {
-                var testmode = $j('#payment_nockspaymentgateway_testmode').val();
-                var accessToken = $j('#payment_nockspaymentgateway_access_token').val();
+                var testmode = $j('#payment_nocks_testmode').val();
+                var accessToken = $j('#payment_nocks_access_token').val();
 
                 $j.ajax({
                     method: 'POST',
@@ -57,10 +57,10 @@
                         }
 
                         $merchantSelect.show();
-                        $j('#payment_nockspaymentgateway_merchants_message').hide();
+                        $j('#payment_nocks_merchants_message').hide();
                     } else {
                         $merchantSelect.hide();
-                        $j('#payment_nockspaymentgateway_merchants_message')
+                        $j('#payment_nocks_merchants_message')
                             .html(noMerchantsFoundText)
                             .show();
                     }
@@ -68,11 +68,11 @@
             }, 200);
         }
 
-        $j('#payment_nockspaymentgateway_testmode').on('change', function() {
+        $j('#payment_nocks_testmode').on('change', function() {
             getMerchants();
         });
 
-        $j('#payment_nockspaymentgateway_access_token').on('change keyup', function() {
+        $j('#payment_nocks_access_token').on('change keyup', function() {
             getMerchants();
         });
     });
@@ -80,7 +80,7 @@
     Validation.addAllThese([
         ['validate-accessToken', invalidAccessTokenText, function(v) {
             var valid = false;
-            var testmode = $j('#payment_nockspaymentgateway_testmode').val();
+            var testmode = $j('#payment_nocks_testmode').val();
 
             $j.ajax({
                 method: 'POST',

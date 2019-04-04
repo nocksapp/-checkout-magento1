@@ -5,3 +5,5 @@
 "Invalid access token, make sure the access token has the right scopes", "Ongeldige access token, zorg ervoor dat de access token de juiste scopes heeft"
 "No merchants found", "Geen merchants gevonden"
 "Loading merchants", "Merchants aan het laden"
+"Select your bank", "Selecteer je bank"
+"We have not received a definite payment status. Depending on the payment method, it may take a while until we receive the payment", "We hebben nog geen definitieve betaling ontvangen. Afhankelijk van de betaalmethode kan het even duren totdat we de betaling binnenkrijgen"
