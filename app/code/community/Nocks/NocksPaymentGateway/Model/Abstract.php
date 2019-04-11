@@ -45,7 +45,9 @@ abstract class Nocks_NocksPaymentGateway_Model_Abstract extends Mage_Payment_Mod
 			'payment_method' => $this->getPaymentMethodData(),
 			'metadata' => [
 				'payment_id' => $payment->getId(),
+				'nocks_plugin' => 'magento1:1.2.0'
 			],
+			'description' => $order->getRealOrderId() . ' - ' . $order->getStore()->getFrontendName(),
 		];
 
 		if ($this->_sourceCurrency) {
