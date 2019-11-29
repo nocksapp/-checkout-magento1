@@ -14,5 +14,21 @@ if (sizeof($issuers) > 0) {
             </select>
          </div>
     </div>
+    <script type="text/javascript">
+        var nocksIdealIssuerSelect = document.getElementById('nocks_ideal_issuer');
+        var button = document.getElementById('payment-buttons-container').getElementsByTagName('button')[0];
+
+        var checkDisable = function() {
+            button.disabled = document.querySelector('input[name="payment[method]"]:checked').value === 'nocks_ideal' && nocksIdealIssuerSelect.value === '';
+        };
+
+        var input = document.querySelectorAll('input[name="payment[method]"]').forEach((inputElement) => {
+            inputElement.onchange = checkDisable;
+        })
+
+        nocksIdealIssuerSelect.onchange = checkDisable;
+
+        checkDisable();
+    </script>
 	<?php
 }
